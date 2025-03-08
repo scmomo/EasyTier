@@ -9,7 +9,7 @@ use pnet::packet::tcp::{ipv4_checksum, MutableTcpPacket, TcpPacket};
 use pnet::packet::MutablePacket;
 use pnet::packet::Packet;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, SocketAddrV4};
-use std::sync::atomic::{AtomicBool, AtomicU16};
+use portable_atomic::{AtomicBool, AtomicU16};
 use std::sync::{Arc, Weak};
 use std::time::{Duration, Instant};
 use tokio::io::{copy_bidirectional, AsyncRead, AsyncWrite, AsyncWriteExt};
@@ -296,7 +296,7 @@ impl<C: NatDstConnector> PeerPacketFilter for TcpProxy<C> {
         if let Some(_) = self.try_handle_peer_packet(&mut packet).await {
             if self
                 .enable_smoltcp
-                .load(std::sync::atomic::Ordering::Relaxed)
+                .load(portable_atomic::Ordering::Relaxed)
             {
                 let smoltcp_stack_sender = self.smoltcp_stack_sender.as_ref().unwrap();
                 if let Err(e) = smoltcp_stack_sender.try_send(packet) {
@@ -485,7 +485,7 @@ impl<C: NatDstConnector> TcpProxy<C> {
         {
             // use smoltcp network stack
             self.local_port
-                .store(8899, std::sync::atomic::Ordering::Relaxed);
+                .store(8899, portable_atomic::Ordering::Relaxed);
 
             let mut cap = smoltcp::phy::DeviceCapabilities::default();
             cap.max_transmission_unit = 1280;
@@ -543,7 +543,7 @@ impl<C: NatDstConnector> TcpProxy<C> {
             let tcp = SmolTcpListener::new(self.smoltcp_net.clone(), 64).await;
 
             self.enable_smoltcp
-                .store(true, std::sync::atomic::Ordering::Relaxed);
+                .store(true, portable_atomic::Ordering::Relaxed);
 
             return Ok(ProxyTcpListener::SmolTcpListener(tcp));
         }
@@ -557,11 +557,11 @@ impl<C: NatDstConnector> TcpProxy<C> {
                 .await?;
             self.local_port.store(
                 tcp_listener.local_addr()?.port(),
-                std::sync::atomic::Ordering::Relaxed,
+                portable_atomic::Ordering::Relaxed,
             );
 
             self.enable_smoltcp
-                .store(false, std::sync::atomic::Ordering::Relaxed);
+                .store(false, portable_atomic::Ordering::Relaxed);
 
             return Ok(ProxyTcpListener::KernelTcpListener(tcp_listener));
         }
@@ -724,7 +724,7 @@ impl<C: NatDstConnector> TcpProxy<C> {
     }
 
     pub fn get_local_port(&self) -> u16 {
-        self.local_port.load(std::sync::atomic::Ordering::Relaxed)
+        self.local_port.load(portable_atomic::Ordering::Relaxed)
     }
 
     pub fn get_my_peer_id(&self) -> u32 {
@@ -748,7 +748,7 @@ impl<C: NatDstConnector> TcpProxy<C> {
 
     pub fn is_smoltcp_enabled(&self) -> bool {
         self.enable_smoltcp
-            .load(std::sync::atomic::Ordering::Relaxed)
+            .load(portable_atomic::Ordering::Relaxed)
     }
 
     pub fn get_fake_local_ipv4(local_ip: Ipv4Addr) -> Ipv4Addr {

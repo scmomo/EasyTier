@@ -1,4 +1,4 @@
-use std::sync::atomic::{AtomicU32, Ordering::Relaxed};
+use portable_atomic::{AtomicU32, Ordering::Relaxed};
 
 pub struct WindowLatency {
     latency_us_window: Vec<AtomicU32>,

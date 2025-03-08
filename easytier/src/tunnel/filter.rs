@@ -292,7 +292,7 @@ impl StatsRecorderTunnelFilter {
 
 #[cfg(test)]
 pub mod tests {
-    use std::sync::atomic::{AtomicU32, Ordering};
+    use portable_atomic::{AtomicU32, Ordering};
 
     use filter::ring::create_ring_tunnel_pair;
 
@@ -310,7 +310,7 @@ pub mod tests {
         fn before_send(&self, data: SinkItem) -> Option<SinkItem> {
             self.cur.fetch_add(1, Ordering::SeqCst);
             if self.cur.load(Ordering::SeqCst) >= self.start.load(Ordering::SeqCst)
-                && self.cur.load(std::sync::atomic::Ordering::SeqCst)
+                && self.cur.load(portable_atomic::Ordering::SeqCst)
                     < self.end.load(Ordering::SeqCst)
             {
                 tracing::trace!("drop packet: {:?}", data);

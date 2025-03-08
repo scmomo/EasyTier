@@ -1,4 +1,4 @@
-use std::sync::{atomic::AtomicBool, Arc, Mutex};
+use portable_atomic::{AtomicBool, Arc, Mutex};
 
 use futures::{SinkExt as _, StreamExt};
 use tokio::{task::JoinSet, time::timeout};
@@ -54,7 +54,7 @@ impl BidirectRpcManager {
         self.rpc_client.run();
         self.rpc_server.run();
         self.running
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+            .store(true, portable_atomic::Ordering::Relaxed);
 
         let (server_tx, mut server_rx) = (
             self.rpc_server.get_transport_sink(),
@@ -72,7 +72,7 @@ impl BidirectRpcManager {
         let r_clone = self.running.clone();
         tasks.spawn(async move {
             defer! {
-                r_clone.store(false, std::sync::atomic::Ordering::Relaxed);
+                r_clone.store(false, portable_atomic::Ordering::Relaxed);
             }
             loop {
                 let packet = tokio::select! {
@@ -102,7 +102,7 @@ impl BidirectRpcManager {
         let r_clone = self.running.clone();
         tasks.spawn(async move {
             defer! {
-                r_clone.store(false, std::sync::atomic::Ordering::Relaxed);
+                r_clone.store(false, portable_atomic::Ordering::Relaxed);
             }
             loop {
                 let ret = if let Some(recv_timeout) = recv_timeout {
@@ -176,6 +176,6 @@ impl BidirectRpcManager {
     }
 
     pub fn is_running(&self) -> bool {
-        self.running.load(std::sync::atomic::Ordering::Relaxed)
+        self.running.load(portable_atomic::Ordering::Relaxed)
     }
 }

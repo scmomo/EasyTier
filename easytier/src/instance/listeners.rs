@@ -230,7 +230,7 @@ impl<H: TunnelHandlerForListener + Send + Sync + 'static + Debug> ListenerManage
 
 #[cfg(test)]
 mod tests {
-    use std::sync::atomic::{AtomicI32, Ordering};
+    use portable_atomic::{AtomicI32, Ordering};
 
     use futures::{SinkExt, StreamExt};
     use tokio::time::timeout;

@@ -1,6 +1,7 @@
 use core::panic;
+use portable_atomic::AtomicU32;
 use std::{
-    sync::{atomic::AtomicU32, Arc},
+    sync::Arc,
     time::Duration,
 };
 
@@ -572,7 +573,7 @@ pub async fn udp_broadcast_test() {
         let mut recv_buff = [0; 8092];
         while let Ok((n, addr)) = socket.recv_from(&mut recv_buff).await {
             println!("{} bytes response from {:?}", n, addr);
-            counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            counter.fetch_add(1, portable_atomic::Ordering::Relaxed);
             // Remaining code not directly relevant to the question
         }
     };
@@ -604,7 +605,7 @@ pub async fn udp_broadcast_test() {
     }
 
     tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
-    assert_eq!(counter.load(std::sync::atomic::Ordering::Relaxed), 2);
+    assert_eq!(counter.load(portable_atomic::Ordering::Relaxed), 2);
 }
 
 #[tokio::test]

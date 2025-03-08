@@ -1,6 +1,7 @@
+use portable_atomic::AtomicBool;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
-    sync::{atomic::AtomicBool, Arc},
+    sync::Arc,
     time::Duration,
 };
 
@@ -80,7 +81,7 @@ impl UdpNatEntry {
 
     pub fn stop(&self) {
         self.stopped
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+            .store(true, portable_atomic::Ordering::Relaxed);
     }
 
     async fn compose_ipv4_packet(
@@ -148,7 +149,7 @@ impl UdpNatEntry {
             loop {
                 if self_clone
                     .stopped
-                    .load(std::sync::atomic::Ordering::Relaxed)
+                    .load(portable_atomic::Ordering::Relaxed)
                 {
                     break;
                 }

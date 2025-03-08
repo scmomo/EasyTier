@@ -1,8 +1,9 @@
+use portable_atomic::AtomicBool;
 use std::{
     fmt::{Debug, Formatter},
     net::SocketAddr,
     pin::Pin,
-    sync::{atomic::AtomicBool, Arc},
+    sync::Arc,
     time::Duration,
 };
 
@@ -378,7 +379,7 @@ impl WgPeer {
             }
         }
         data.stopped
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+            .store(true, portable_atomic::Ordering::Relaxed);
     }
 
     async fn handle_packet_from_peer(&self, packet: &[u8]) {
@@ -419,7 +420,7 @@ impl WgPeer {
             .as_ref()
             .unwrap()
             .stopped
-            .load(std::sync::atomic::Ordering::Relaxed)
+            .load(portable_atomic::Ordering::Relaxed)
     }
 
     async fn create_handshake_init(&self) -> Vec<u8> {

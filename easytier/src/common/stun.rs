@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 use std::net::{IpAddr, SocketAddr};
-use std::sync::atomic::AtomicBool;
+use portable_atomic::AtomicBool;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
@@ -719,11 +719,11 @@ impl StunInfoCollector {
     }
 
     fn start_stun_routine(&self) {
-        if self.started.load(std::sync::atomic::Ordering::Relaxed) {
+        if self.started.load(portable_atomic::Ordering::Relaxed) {
             return;
         }
         self.started
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+            .store(true, portable_atomic::Ordering::Relaxed);
 
         let stun_servers = self.stun_servers.clone();
         let udp_nat_test_result = self.udp_nat_test_result.clone();

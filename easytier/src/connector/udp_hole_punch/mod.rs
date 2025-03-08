@@ -1,4 +1,5 @@
-use std::sync::{atomic::AtomicBool, Arc};
+use portable_atomic::AtomicBool;
+use std::sync::Arc;
 
 use anyhow::{Context, Error};
 use both_easy_sym::{PunchBothEasySymHoleClient, PunchBothEasySymHoleServer};
@@ -275,7 +276,7 @@ impl UdpHoePunchConnectorData {
             backoff.sleep_for_next_backoff().await;
 
             // always try cone first
-            if !RUN_TESTING.load(std::sync::atomic::Ordering::Relaxed) {
+            if !RUN_TESTING.load(portable_atomic::Ordering::Relaxed) {
                 let ret = self
                     .cone_client
                     .do_hole_punching(task_info.dst_peer_id)
@@ -318,7 +319,7 @@ impl UdpHoePunchConnectorData {
             backoff.sleep_for_next_backoff().await;
 
             // always try cone first
-            if !RUN_TESTING.load(std::sync::atomic::Ordering::Relaxed) {
+            if !RUN_TESTING.load(portable_atomic::Ordering::Relaxed) {
                 let ret = self
                     .cone_client
                     .do_hole_punching(task_info.dst_peer_id)

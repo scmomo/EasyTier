@@ -1,7 +1,6 @@
-use std::{
-    sync::{atomic::AtomicU32, Arc, Mutex},
-    time::Duration,
-};
+use portable_atomic::AtomicU32;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use anyhow::Context as _;
 use tokio::task::JoinSet;
@@ -53,14 +52,14 @@ impl<L: TunnelListener + 'static> StandAloneServer<L> {
             let tunnel = listener.accept().await?;
             let registry = registry.clone();
             let inflight_server = inflight.clone();
-            inflight_server.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            inflight_server.fetch_add(1, portable_atomic::Ordering::Relaxed);
             tasks.lock().unwrap().spawn(async move {
                 let server =
                     BidirectRpcManager::new().set_rx_timeout(Some(Duration::from_secs(60)));
                 server.rpc_server().registry().replace_registry(&registry);
                 server.run_with_tunnel(tunnel);
                 server.wait().await;
-                inflight_server.fetch_sub(1, std::sync::atomic::Ordering::Relaxed);
+                inflight_server.fetch_sub(1, portable_atomic::Ordering::Relaxed);
             });
         }
     }
@@ -97,7 +96,7 @@ impl<L: TunnelListener + 'static> StandAloneServer<L> {
 
     pub fn inflight_server(&self) -> u32 {
         self.inflight_server
-            .load(std::sync::atomic::Ordering::Relaxed)
+            .load(portable_atomic::Ordering::Relaxed)
     }
 }
 

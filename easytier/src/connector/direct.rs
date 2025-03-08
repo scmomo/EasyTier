@@ -1,11 +1,8 @@
 // try connect peers directly, with either its public ip or lan ip
-
+use portable_atomic::{AtomicBool, Ordering};
 use std::{
     net::SocketAddr,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
+    sync::Arc,
     time::Duration,
 };
 
@@ -481,7 +478,7 @@ mod tests {
 
     #[tokio::test]
     async fn direct_connector_mapped_listener() {
-        TESTING.store(true, std::sync::atomic::Ordering::Relaxed);
+        TESTING.store(true, portable_atomic::Ordering::Relaxed);
         let p_a = create_mock_peer_manager().await;
         let p_b = create_mock_peer_manager().await;
         let p_c = create_mock_peer_manager().await;

@@ -1,6 +1,7 @@
+use portable_atomic::AtomicBool;
 use std::{
     collections::VecDeque,
-    sync::{atomic::AtomicBool, Arc, RwLock},
+    sync::{Arc, RwLock},
 };
 
 use crate::{
@@ -220,7 +221,7 @@ impl EasyTierLauncher {
         let stop_flag = self.stop_flag.clone();
 
         let instance_alive = self.instance_alive.clone();
-        instance_alive.store(true, std::sync::atomic::Ordering::Relaxed);
+        instance_alive.store(true, portable_atomic::Ordering::Relaxed);
 
         let data = self.data.clone();
         let fetch_node_info = self.fetch_node_info;
@@ -242,7 +243,7 @@ impl EasyTierLauncher {
 
             let stop_notifier_clone = stop_notifier.clone();
             rt.spawn(async move {
-                while !stop_flag.load(std::sync::atomic::Ordering::Relaxed) {
+                while !stop_flag.load(portable_atomic::Ordering::Relaxed) {
                     tokio::time::sleep(std::time::Duration::from_millis(100)).await;
                 }
                 stop_notifier_clone.notify_one();
@@ -258,7 +259,7 @@ impl EasyTierLauncher {
             if let Err(e) = ret {
                 error_msg.write().unwrap().replace(format!("{:?}", e));
             }
-            instance_alive.store(false, std::sync::atomic::Ordering::Relaxed);
+            instance_alive.store(false, portable_atomic::Ordering::Relaxed);
             notifier.notify_one();
         }));
     }
@@ -269,7 +270,7 @@ impl EasyTierLauncher {
 
     pub fn running(&self) -> bool {
         self.instance_alive
-            .load(std::sync::atomic::Ordering::Relaxed)
+            .load(portable_atomic::Ordering::Relaxed)
     }
 
     pub fn get_dev_name(&self) -> String {
@@ -297,7 +298,7 @@ impl EasyTierLauncher {
 impl Drop for EasyTierLauncher {
     fn drop(&mut self) {
         self.stop_flag
-            .store(true, std::sync::atomic::Ordering::Relaxed);
+            .store(true, portable_atomic::Ordering::Relaxed);
         if let Some(handle) = self.thread_handle.take() {
             if let Err(e) = handle.join() {
                 println!("Error when joining thread: {:?}", e);

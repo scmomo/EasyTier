@@ -196,7 +196,7 @@ impl Client {
                 method: <Self::Descriptor as ServiceDescriptor>::Method,
                 input: bytes::Bytes,
             ) -> Result<bytes::Bytes> {
-                let transaction_id = CUR_TID.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                let transaction_id = CUR_TID.fetch_add(1, portable_atomic::Ordering::Relaxed);
                 let (tx, mut rx) = mpsc::unbounded_channel();
                 let key = InflightRequestKey {
                     from_peer_id: self.from_peer_id,

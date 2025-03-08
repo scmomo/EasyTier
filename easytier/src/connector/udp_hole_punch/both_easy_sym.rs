@@ -318,9 +318,10 @@ impl PunchBothEasySymHoleClient {
 
 #[cfg(test)]
 pub mod tests {
+    use portable_atomic::AtomicU32;
     use std::{
-        sync::{atomic::AtomicU32, Arc},
-        time::Duration,
+        sync::Arc,
+        time::{Duration, Instant},
     };
 
     use tokio::net::UdpSocket;
@@ -339,7 +340,7 @@ pub mod tests {
     #[tokio::test]
     #[serial_test::serial(hole_punch)]
     async fn hole_punching_easy_sym(#[values("true", "false")] is_inc: bool) {
-        RUN_TESTING.store(true, std::sync::atomic::Ordering::Relaxed);
+        RUN_TESTING.store(true, portable_atomic::Ordering::Relaxed);
 
         let p_a = create_mock_peer_manager_with_mock_stun(if is_inc {
             NatType::SymmetricEasyInc
@@ -384,14 +385,14 @@ pub mod tests {
                     addr,
                     udp.local_addr()
                 );
-                counter.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                counter.fetch_add(1, portable_atomic::Ordering::Relaxed);
             });
         }
 
         hole_punching_a.client.run_immediately().await;
         let udp_len = udps.len();
         wait_for_condition(
-            || async { counter.load(std::sync::atomic::Ordering::Relaxed) == udp_len as u32 },
+            || async { counter.load(portable_atomic::Ordering::Relaxed) == udp_len as u32 },
             Duration::from_secs(30),
         )
         .await;
