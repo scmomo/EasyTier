@@ -75,3 +75,15 @@ rustflags = [
     "-l",
     "atomic",
 ]
+[target.armv5te-unknown-linux-musleabi]
+linker = "arm-linux-musleabi-gcc"
+rustflags = [
+    "-C",
+    "target-feature=+crt-static",
+    "-L",
+    "./musl_gcc/arm-linux-musleabi-cross/arm-linux-musleabi/lib",
+    "-L",
+    "./musl_gcc/arm-linux-musleabi-cross/lib/gcc/arm-linux-musleabi/11.2.1",
+    "-l",
+    "atomic",
+]

@@ -1,11 +1,9 @@
+use portable_atomic::{AtomicU32, Ordering};
 use std::{
     any::Any,
     fmt::Debug,
     pin::Pin,
-    sync::{
-        atomic::{AtomicU32, Ordering},
-        Arc,
-    },
+    sync::Arc,
 };
 
 use futures::{StreamExt, TryFutureExt};

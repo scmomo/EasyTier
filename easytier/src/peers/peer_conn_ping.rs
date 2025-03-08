@@ -1,8 +1,6 @@
+use portable_atomic::{AtomicU32, Ordering};
 use std::{
-    sync::{
-        atomic::{AtomicU32, Ordering},
-        Arc,
-    },
+    sync::Arc,
     time::Duration,
 };
 

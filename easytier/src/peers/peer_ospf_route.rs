@@ -1,11 +1,9 @@
+use portable_atomic::{AtomicBool, AtomicU32, Ordering};
 use std::{
     collections::BTreeSet,
     fmt::Debug,
     net::Ipv4Addr,
-    sync::{
-        atomic::{AtomicBool, AtomicU32, Ordering},
-        Arc, Weak,
-    },
+    sync::Arc, Weak,
     time::{Duration, Instant, SystemTime},
 };
 
@@ -2200,9 +2198,10 @@ impl PeerPacketFilter for Arc<PeerRoute> {}
 
 #[cfg(test)]
 mod tests {
+    use portable_atomic::Ordering;
     use std::{
         collections::BTreeSet,
-        sync::{atomic::Ordering, Arc},
+        sync:: Arc,
         time::Duration,
     };
 

@@ -1,14 +1,11 @@
 // most code is copied from https://github.com/spacemeowx2/tokio-smoltcp
 
 //! An asynchronous wrapper for smoltcp.
-
+use portable_atomic::{AtomicU16, Ordering};
 use std::{
     io,
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
-    sync::{
-        atomic::{AtomicU16, Ordering},
-        Arc,
-    },
+    sync::Arc,
 };
 
 use device::BufferDevice;
